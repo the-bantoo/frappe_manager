@@ -89,6 +89,16 @@ app_license = "MIT"
 # ---------------
 # Hook on document methods and events
 
+doc_events = {
+    "Lead": {
+        "after_insert": "frappe_manager.app.add_site",
+        #"on_update": "frappe_manager.api.add_site",
+    },
+	"Site": {
+		"on_update": "frappe_manager.app.email_client"
+	}
+}
+
 # doc_events = {
 # 	"*": {
 # 		"on_update": "method",
