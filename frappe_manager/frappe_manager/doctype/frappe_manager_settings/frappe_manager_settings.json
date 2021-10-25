@@ -1,0 +1,154 @@
+{
+ "actions": [],
+ "allow_copy": 1,
+ "allow_rename": 1,
+ "creation": "2021-10-08 17:16:56.895521",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "general_settings_section",
+  "server_ip",
+  "testing",
+  "column_break_3",
+  "frappe_database_password",
+  "server_sudo_password",
+  "domain_settings_section",
+  "domain_provider",
+  "domain",
+  "column_break_5",
+  "username",
+  "api_key",
+  "site_settings_section",
+  "auto_create_sites",
+  "column_break_10",
+  "set_ssl"
+ ],
+ "fields": [
+  {
+   "fieldname": "general_settings_section",
+   "fieldtype": "Section Break",
+   "label": "General Settings"
+  },
+  {
+   "fieldname": "server_ip",
+   "fieldtype": "Data",
+   "label": "Server IP"
+  },
+  {
+   "default": "0",
+   "fieldname": "testing",
+   "fieldtype": "Check",
+   "label": "Testing"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "frappe_database_password",
+   "fieldtype": "Data",
+   "label": "Frappe Database Password",
+   "reqd": 1
+  },
+  {
+   "fieldname": "server_sudo_password",
+   "fieldtype": "Data",
+   "label": "Server sudo Password",
+   "reqd": 1
+  },
+  {
+   "fieldname": "domain_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Domain Settings"
+  },
+  {
+   "fieldname": "domain_provider",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Domain Provider",
+   "options": "Namecheap",
+   "reqd": 1
+  },
+  {
+   "fieldname": "domain",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Domain",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "username",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Username",
+   "reqd": 1
+  },
+  {
+   "fieldname": "api_key",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "API Key",
+   "reqd": 1
+  },
+  {
+   "fieldname": "site_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Site Settings"
+  },
+  {
+   "default": "0",
+   "fieldname": "auto_create_sites",
+   "fieldtype": "Check",
+   "label": "Auto Create Sites"
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "set_ssl",
+   "fieldtype": "Check",
+   "label": "Set SSL"
+  }
+ ],
+ "hide_toolbar": 1,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2021-10-25 16:04:11.751421",
+ "modified_by": "Administrator",
+ "module": "Frappe Manager",
+ "name": "Frappe Manager Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Sales Master Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
