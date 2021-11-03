@@ -9,6 +9,25 @@ app_color = "grey"
 app_email = "devs@thebantoo.com"
 app_license = "MIT"
 
+website_context = {
+	"favicon": 	"/assets/frappe_manager/images/qpos_logo.svg",
+	"splash_image": "/assets/frappe_manager/images/qpos_logo.svg"
+}
+
+app_logo_url = "/assets/frappe_manager/images/qpos_logo.svg"
+email_brand_image = "assets/frappe_manager/images/qpos_logo.jpg"
+default_mail_footer = """
+	<span>
+		Sent via
+		<a class="text-muted" href="https://qpos.cloud?source=via_email_footer" target="_blank">
+			QPOS
+		</a>
+	</span>
+"""
+
+after_migrate = "frappe_manager.app.add_app_name"
+
+
 # Includes in <head>
 # ------------------
 

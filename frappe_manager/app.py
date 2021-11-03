@@ -41,6 +41,12 @@ v2
 ## get and email lead
 ## copy template
 
+
+
+def add_app_name():
+	frappe.db.set_value('System Settings', None, 'app_name', 'QPOS')
+
+
 def email_client(site, method=None):
     """send mail with login details"""
     
@@ -171,6 +177,9 @@ def create_site(site_name, install_erpnext, mysql_password, admin_password, lead
         if "erpnext" not in app_list:
             commands.append("bench get-app erpnext")
         commands.append(
+            "bench setup nginx --yes"
+        )
+        commands.append(
             "bench --site {site_name} install-app erpnext".format(site_name=site_name)
         )
         commands.append(
@@ -178,9 +187,6 @@ def create_site(site_name, install_erpnext, mysql_password, admin_password, lead
         )
         commands.append(
             "bench --site {site_name} migrate".format(site_name=site_name)
-        )
-        commands.append(
-            "bench setup nginx --yes"
         )
     
     frappe.enqueue(
@@ -249,6 +255,7 @@ def get_server_ip():
     frappe.db.set_value('Frappe Manager Settings', 'Frappe Manager Settings', 'server_ip', ip)
 
     return ip
+
 
 def fetch(url): # error handling here, anything outside the accepted response
     headers = CaseInsensitiveDict()
