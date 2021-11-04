@@ -36,17 +36,22 @@ v2
 - ## array in lower case, add another element, add pos, add nums
 """
 
+def add_app_name():
+    """set login page app name"""
+    frappe.db.set_value('System Settings', None, 'app_name', 'QPOS')
+
+
+@frappe.whitelist(allow_guest=True)
+def create_lead(doc):
+    """create lead from website form"""
+    
+    frappe.set_user("Administrator")
+    frappe.client.insert(doc)
+
 
 # Email client
 ## get and email lead
 ## copy template
-
-
-
-def add_app_name():
-	frappe.db.set_value('System Settings', None, 'app_name', 'QPOS')
-
-
 def email_client(site, method=None):
     """send mail with login details"""
     
@@ -85,38 +90,39 @@ def _refresh(doctype, docname, commands):
 
 
 def safe_decode(string, encoding="utf-8"):
-	try:
-		string = string.decode(encoding)
-	except Exception:
-		pass
-	return string
+    try:
+        string = string.decode(encoding)
+    except Exception:
+        pass
+    return string
 
 
+@frappe.whitelist()
 def get_installed_apps(site_name):
+    all_sites = safe_decode(check_output("ls")).strip("\n").split("\n")
+
+    retry = 0
+    while site_name not in all_sites and retry < 3:
+        time.sleep(2)
+        print("waiting for site creation...")
+        retry += 1
         all_sites = safe_decode(check_output("ls")).strip("\n").split("\n")
 
-        retry = 0
-        while site_name not in all_sites and retry < 3:
-            time.sleep(2)
-            print("waiting for site creation...")
-            retry += 1
-            all_sites = safe_decode(check_output("ls")).strip("\n").split("\n")
+    if retry == 3 and site_name not in all_sites:
+        list_apps = "frappe"
+    else:
+        list_apps = check_output(
+            shlex.split("bench --site {site_name} list-apps".format(site_name=site_name)),
+            cwd="..",
+        )
 
-        if retry == 3 and site_name not in all_sites:
-            list_apps = "frappe"
-        else:
-            list_apps = check_output(
-                shlex.split("bench --site {site_name} list-apps".format(site_name=site_name)),
-                cwd="..",
-            )
-
-        if "frappe" not in safe_decode(list_apps):
-            list_apps = "frappe"
-        return safe_decode(list_apps).strip("\n").split("\n")
+    if "frappe" not in safe_decode(list_apps):
+        list_apps = "frappe"
+    return safe_decode(list_apps).strip("\n").split("\n")
 
 
 # setup site
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def add_site(lead, method=None):
     
     if type(lead) is str:
@@ -207,9 +213,11 @@ def create_site(site_name, install_erpnext, mysql_password, admin_password, lead
         "site_admin_password": admin_password, 
         "lead": leadname, 
         "automatically_created": 1,
-        "developer_flag": 1 
+        "developer_flag": 1
     })
-    doc.insert()
+    doc.flags.ignore_validate_update_after_submit = True
+    doc.flags.ignore_validate = True
+    doc.insert(ignore_permissions=True)
     #frappe.db.commit()
     return "completed"
 
