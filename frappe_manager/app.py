@@ -83,6 +83,33 @@ def email_client(site, method=None):
     frappe.sendmail(recipients=lead.email_id, sender=sender, subject=subject,
         template=template, args=args, header=[subject, "green"],
         delayed=None, retry=3)
+    
+    certify_site(site.name)
+
+
+@frappe.whitelist()
+def certify_site(site, method=None):
+    #site = "a.qpos.cloud"
+    settings = frappe.get_cached_doc('Frappe Manager Settings')
+
+    certbot_command = "sudo -S certbot install --reinstall --nginx --cert-name {0} -n -d {1}".format(settings.domain, site)
+    reload_nginx = "sudo -S service nginx reload"
+    cwd = ".."
+
+    try:
+        terminal = Popen(
+            certbot_command, stdin=PIPE, stdout=PIPE, stderr=STDOUT, cwd=cwd, shell=True
+        )
+        out, err = terminal.communicate(settings.server_sudo_password.encode()) 
+
+    except Exception as e:
+        frappe.errprint(e)
+        
+    finally:
+        terminal2 = Popen(
+            reload_nginx, stdin=PIPE, stdout=PIPE, stderr=STDOUT, cwd=cwd, shell=True
+        )
+        out, err = terminal2.communicate(settings.server_sudo_password.encode()) 
 
 
 def _refresh(doctype, docname, commands):

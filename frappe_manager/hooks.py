@@ -111,7 +111,7 @@ after_migrate = "frappe_manager.app.add_app_name"
 doc_events = {
     "Lead": {
         "after_insert": "frappe_manager.app.add_site",
-        #"on_update": "frappe_manager.api.add_site",
+        #"on_update": "frappe_manager.app.certify_site"
     },
 	"Site": {
 		"on_update": "frappe_manager.app.email_client"
