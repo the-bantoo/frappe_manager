@@ -114,7 +114,8 @@ doc_events = {
         #"on_update": "frappe_manager.app.certify_site"
     },
 	"Site": {
-		"on_update": "frappe_manager.app.email_client"
+		"after_insert": "frappe_manager.app.email_client",
+		#"after_insert": "frappe_manager.app.certify_site"
 	}
 }
 

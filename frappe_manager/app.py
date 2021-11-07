@@ -52,6 +52,7 @@ def create_lead(doc):
 # Email client
 ## get and email lead
 ## copy template
+@frappe.whitelist(allow_guest=True)
 def email_client(site, method=None):
     """send mail with login details"""
     
@@ -87,20 +88,26 @@ def email_client(site, method=None):
     certify_site(site.name)
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def certify_site(site, method=None):
+    #lead = frappe.get_doc('Lead', site)
+    #site = site.name
     #site = "a.qpos.cloud"
     settings = frappe.get_cached_doc('Frappe Manager Settings')
 
+    #time.sleep(30)
     certbot_command = "sudo -S certbot install --reinstall --nginx --cert-name {0} -n -d {1}".format(settings.domain, site)
     reload_nginx = "sudo -S service nginx reload"
     cwd = ".."
 
     try:
+        Popen(
+            "bench setup nginx --yes", stdin=PIPE, stdout=PIPE, stderr=STDOUT, cwd=os.path.dirname(os.path.realpath(__file__)), shell=True
+        )
         terminal = Popen(
             certbot_command, stdin=PIPE, stdout=PIPE, stderr=STDOUT, cwd=cwd, shell=True
         )
-        out, err = terminal.communicate(settings.server_sudo_password.encode()) 
+        out1, err1 = terminal.communicate(settings.server_sudo_password.encode()) 
 
     except Exception as e:
         frappe.errprint(e)
@@ -110,6 +117,10 @@ def certify_site(site, method=None):
             reload_nginx, stdin=PIPE, stdout=PIPE, stderr=STDOUT, cwd=cwd, shell=True
         )
         out, err = terminal2.communicate(settings.server_sudo_password.encode()) 
+        """frappe.errprint(str(err1))
+        frappe.errprint(str(out1))
+        frappe.errprint(str(err))
+        frappe.errprint(str(out))"""
 
 
 def _refresh(doctype, docname, commands):
@@ -210,9 +221,6 @@ def create_site(site_name, install_erpnext, mysql_password, admin_password, lead
         if "erpnext" not in app_list:
             commands.append("bench get-app erpnext")
         commands.append(
-            "bench setup nginx --yes"
-        )
-        commands.append(
             "bench --site {site_name} install-app erpnext".format(site_name=site_name)
         )
         commands.append(
@@ -221,7 +229,10 @@ def create_site(site_name, install_erpnext, mysql_password, admin_password, lead
         commands.append(
             "bench --site {site_name} migrate".format(site_name=site_name)
         )
-    
+        
+        """commands.append(
+            "bench setup nginx --yes"
+        )"""
     frappe.enqueue(
         "bench_manager.bench_manager.utils.run_command",
         commands=commands,
