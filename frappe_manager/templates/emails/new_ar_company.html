@@ -1,0 +1,29 @@
+<p>
+	{{"QPOS نورتنا في منصة"}} {{ name }}
+</p>
+{% set site_link = "<a href='" + link + "'>" + site_url + "</a>" %}
+<p style="margin-top: 15px"><br>{{"QPOS تم إنشاء حساب جديد لك على {0}".format(site_link)}}</p>
+
+<p style="margin-top: 20px">
+	<br>
+	{{_("Username")}}: <b>{{ user }}</b><br>
+	{{_("Password")}}: <b>{{ password }}</b>
+</p>
+<p><br>{{"QPOS اضغط على الرابط بالأسفل واستمتع باستكشاف"}}</p>
+
+<p style="margin: 20px 0px;">
+	<a href="{{ link }}" rel="nofollow" class="btn btn-primary">{{ " QPOS استمتع باستكشاف" }}</a>
+</p>
+
+{% if created_by != "Administrator" %}
+
+<p style="margin-top: 15px">
+	{{ "شكرا" }}<br>
+	{{ created_by }}
+</p>
+{% endif %}
+<br>
+<p>
+	{{ "يمكنك أيضاَ نسخ الرابط بالاسفل والبحث عنه في محرك البحث" }}<br>
+	<a href="{{ link }}">{{ link }}</a>
+</p>

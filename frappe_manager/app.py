@@ -39,6 +39,7 @@ v2
 def add_app_name():
     """set login page app name"""
     frappe.db.set_value('System Settings', None, 'app_name', 'QPOS')
+    frappe.db.set_value('System Settings', None, 'disable_standard_email_footer', 1)
 
 
 @frappe.whitelist(allow_guest=True)
@@ -47,7 +48,7 @@ def create_lead(doc):
     
     frappe.set_user("Administrator")
     frappe.client.insert(doc)
-
+    
 
 # Email client
 ## get and email lead
@@ -63,6 +64,8 @@ def email_client(site, method=None):
 
     subject = "Welcome to QPOS 🎉"
     template = "new_company"
+    if lead.language == "ar":
+        template = "new_ar_company"
 
     created_by = get_user_fullname(frappe.session['user'])
     if created_by == "Guest":
@@ -80,7 +83,7 @@ def email_client(site, method=None):
     }
 
     sender = frappe.session.user not in frappe.core.doctype.user.user.get_formatted_email(frappe.session.user) or None
-
+    
     frappe.sendmail(recipients=lead.email_id, sender=sender, subject=subject,
         template=template, args=args, header=[subject, "green"],
         delayed=None, retry=3)
@@ -90,12 +93,7 @@ def email_client(site, method=None):
 
 @frappe.whitelist(allow_guest=True)
 def certify_site(site, method=None):
-    #lead = frappe.get_doc('Lead', site)
-    #site = site.name
-    #site = "a.qpos.cloud"
     settings = frappe.get_cached_doc('Frappe Manager Settings')
-
-    #time.sleep(30)
     certbot_command = "sudo -S certbot install --reinstall --nginx --cert-name {0} -n -d {1}".format(settings.domain, site)
     reload_nginx = "sudo -S service nginx reload"
     cwd = ".."
@@ -116,11 +114,7 @@ def certify_site(site, method=None):
         terminal2 = Popen(
             reload_nginx, stdin=PIPE, stdout=PIPE, stderr=STDOUT, cwd=cwd, shell=True
         )
-        out, err = terminal2.communicate(settings.server_sudo_password.encode()) 
-        """frappe.errprint(str(err1))
-        frappe.errprint(str(out1))
-        frappe.errprint(str(err))
-        frappe.errprint(str(out))"""
+        out, err = terminal2.communicate(settings.server_sudo_password.encode())
 
 
 def _refresh(doctype, docname, commands):
