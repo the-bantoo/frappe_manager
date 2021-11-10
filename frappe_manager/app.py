@@ -48,7 +48,7 @@ def create_lead(doc):
     
     frappe.set_user("Administrator")
     frappe.client.insert(doc)
-    
+
 
 # Email client
 ## get and email lead
@@ -56,7 +56,7 @@ def create_lead(doc):
 @frappe.whitelist(allow_guest=True)
 def email_client(site, method=None):
     """send mail with login details"""
-    
+
     lead = frappe.get_doc('Lead', site.lead)
 
     site_url = "https://" + site.name + "/login"
@@ -83,11 +83,11 @@ def email_client(site, method=None):
     }
 
     sender = frappe.session.user not in frappe.core.doctype.user.user.get_formatted_email(frappe.session.user) or None
-    
+
     frappe.sendmail(recipients=lead.email_id, sender=sender, subject=subject,
         template=template, args=args, header=[subject, "green"],
         delayed=None, retry=3)
-    
+
     certify_site(site.name)
 
 
@@ -96,11 +96,11 @@ def certify_site(site, method=None):
     settings = frappe.get_cached_doc('Frappe Manager Settings')
     certbot_command = "sudo -S certbot install --reinstall --nginx --cert-name {0} -n -d {1}".format(settings.domain, site)
     reload_nginx = "sudo -S service nginx reload"
-    cwd = ".."
+    cwd = os.path.dirname(os.path.realpath(__file__))
 
     try:
         Popen(
-            "bench setup nginx --yes", stdin=PIPE, stdout=PIPE, stderr=STDOUT, cwd=os.path.dirname(os.path.realpath(__file__)), shell=True
+            "bench setup nginx --yes", stdin=PIPE, stdout=PIPE, stderr=STDOUT, cwd=cwd, shell=True
         )
         terminal = Popen(
             certbot_command, stdin=PIPE, stdout=PIPE, stderr=STDOUT, cwd=cwd, shell=True
@@ -109,13 +109,12 @@ def certify_site(site, method=None):
 
     except Exception as e:
         frappe.errprint(e)
-        
+
     finally:
         terminal2 = Popen(
             reload_nginx, stdin=PIPE, stdout=PIPE, stderr=STDOUT, cwd=cwd, shell=True
         )
         out, err = terminal2.communicate(settings.server_sudo_password.encode())
-
 
 def _refresh(doctype, docname, commands):
     frappe.get_doc(doctype, docname).run_method("after_command", commands=commands)
@@ -145,7 +144,7 @@ def get_installed_apps(site_name):
     else:
         list_apps = check_output(
             shlex.split("bench --site {site_name} list-apps".format(site_name=site_name)),
-            cwd="..",
+            cwd=os.path.dirname(os.path.realpath(__file__))
         )
 
     if "frappe" not in safe_decode(list_apps):
@@ -238,10 +237,10 @@ def create_site(site_name, install_erpnext, mysql_password, admin_password, lead
         time.sleep(2)
         all_sites = safe_decode(check_output("ls")).strip("\n").split("\n")
     
-    doc = frappe.get_doc({  # why pass "app_list" as frappe? 
+    doc = frappe.get_doc({
         "doctype": "Site", 
         "site_name": site_name, 
-        "app_list": "frappe", 
+        "app_list": app_list, 
         "site_admin_password": admin_password, 
         "lead": leadname, 
         "automatically_created": 1,
