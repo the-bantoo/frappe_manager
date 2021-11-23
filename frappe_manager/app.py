@@ -99,9 +99,6 @@ def certify_site(site, method=None):
     cwd = os.path.dirname(os.path.realpath(__file__))
 
     try:
-        Popen(
-            "bench setup nginx --yes", stdin=PIPE, stdout=PIPE, stderr=STDOUT, cwd=cwd, shell=True
-        )
         terminal = Popen(
             certbot_command, stdin=PIPE, stdout=PIPE, stderr=STDOUT, cwd=cwd, shell=True
         )
@@ -222,10 +219,9 @@ def create_site(site_name, install_erpnext, mysql_password, admin_password, lead
         commands.append(
             "bench --site {site_name} migrate".format(site_name=site_name)
         )
-        
-        """commands.append(
+        commands.append(
             "bench setup nginx --yes"
-        )"""
+        )
     frappe.enqueue(
         "bench_manager.bench_manager.utils.run_command",
         commands=commands,
@@ -303,7 +299,7 @@ def fetch(url): # error handling here, anything outside the accepted response
         return requests.get(url, headers=headers)
 
     except Exception as e:
-        frappe.errprint("Something seems is wrong !!! \n \n" + e)
+        frappe.errprint(_("Something seems is wrong !!! \n \n" + e))
 
 
 @frappe.whitelist(allow_guest=True)
